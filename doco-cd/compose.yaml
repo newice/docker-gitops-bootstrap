@@ -1,0 +1,36 @@
+## Uncomment the poll configuration section here and in the service `environment:` section if you want to enable polling of a repository.
+#x-poll-config: &poll-config
+#  POLL_CONFIG: |
+#    - url: https://github.com/kimdre/doco-cd.git  # This is the repository to poll
+#      reference: main  # Optional: specify the branch or tag to poll, defaults to 'main'
+#      interval: 180  # Optional: specify the interval in seconds to poll the repository, defaults to 180 seconds (3 minutes)
+#      target: ""  # Optional: use to target a specific deployment config file, e.g., "test" -> .doco-cd.test.yaml
+
+services:
+  app:
+    container_name: doco-cd
+    # You can also pin to a specific tag (version)
+    # Available tags can be found here: https://github.com/kimdre/doco-cd/pkgs/container/doco-cd
+    image: ghcr.io/kimdre/doco-cd:latest
+    restart: unless-stopped
+    ports:
+      - "8000:80" # Webhook endpoint
+      - "9120:9120" # Prometheus metrics
+    # For all available environment variables and explanations, see https://github.com/kimdre/doco-cd/wiki/App-Settings
+    environment:
+      TZ: ${TZ:-Europe/Berlin}
+      GIT_ACCESS_TOKEN: $GIT_ACCESS_TOKEN
+      WEBHOOK_SECRET: $WEBHOOK_SECRET
+      SOPS_AGE_KEY_FILE: /data/age-keys.txt  # This is the default path where doco-cd looks for age keys, you can change it if you want.
+
+      # <<: *poll-config  # Uncomment this line to use the poll configuration from above (the `x-poll-config` section).
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      # The data volume (left side) can also be replaced with a bind mount to a local directory, for example:
+      - ${DATA_PATH:-.}/data:/data
+    healthcheck:
+      test: [ "CMD", "/doco-cd", "healthcheck" ]
+      start_period: 15s
+      interval: 30s
+      timeout: 5s
+      retries: 3

@@ -3,7 +3,7 @@
 set -euo pipefail
 
 TARGET_DIR="/opt/homelab/doco-cd"
-COMPOSE_URL="https://raw.githubusercontent.com/docker-gitops-bootstrap/main/doco-cd/compose.yaml"
+COMPOSE_URL="https://raw.githubusercontent.com/newice/docker-gitops-bootstrap/main/doco-cd/compose.yaml"
 GIT_ACCESS_TOKEN="xxx" # todo: chnage to param
 
 echo "Creating target directory..."

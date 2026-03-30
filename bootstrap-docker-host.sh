@@ -2,6 +2,11 @@
 
 set -euo pipefail
 
+if [[ $EUID -ne 0 ]]; then
+  echo "Error: This script must be run as root (use sudo)." >&2
+  exit 1
+fi
+
 TARGET_DIR="/opt/homelab/doco-cd"
 COMPOSE_URL="https://raw.githubusercontent.com/newice/docker-gitops-bootstrap/main/doco-cd/compose.yaml"
 ENV_FILE="$TARGET_DIR/.env"
@@ -76,7 +81,7 @@ if [[ -n "$ARG_TOKEN" ]]; then
 elif [[ -n "${EXISTING_GIT_ACCESS_TOKEN:-}" ]]; then
   GIT_ACCESS_TOKEN="$EXISTING_GIT_ACCESS_TOKEN"
 else
-  read -rp "Enter your GitHub access token: " GIT_ACCESS_TOKEN
+  read -rp "Enter your GitHub access token: " GIT_ACCESS_TOKEN < /dev/tty
   if [[ -z "$GIT_ACCESS_TOKEN" ]]; then
     echo "Error: GIT_ACCESS_TOKEN is required." >&2
     exit 1
@@ -113,3 +118,7 @@ echo "==> Starting stack..."
 docker compose up -d --remove-orphans
 
 echo "==> Done. doco-cd is running at http://$(hostname -I | awk '{print $1}'):8000"
+echo "==> GitHub webhook configuration:"
+echo "    Payload URL: http://<your-ip>:8000"
+echo "    Content type: application/json"
+echo "    Secret:       $WEBHOOK_SECRET"

@@ -118,6 +118,9 @@ DATA_PATH=$DATA_PATH
 LOG_LEVEL=$LOG_LEVEL
 EOF
 
+echo "==> Pulling latest images..."
+docker compose pull
+
 echo "==> Starting stack..."
 docker compose up -d --remove-orphans
 

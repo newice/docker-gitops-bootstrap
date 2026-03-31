@@ -11,7 +11,7 @@ It is designed to:
 ## Quickstart 
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/newice/docker-gitops-bootstrap/main/bootstrap-docker-host.sh | bash
+curl -fsSL https://raw.githubusercontent.com/newice/docker-gitops-bootstrap/main/bootstrap-docker-host.sh | bash
 ```
 
 ## Key Characteristics

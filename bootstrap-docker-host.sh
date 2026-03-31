@@ -64,8 +64,12 @@ done
 
 # --- Main ---
 
-echo "==> Creating target directory..."
-mkdir -p "$TARGET_DIR"
+if [[ -d "$TARGET_DIR" ]]; then
+  echo "==> Target directory exists, running in update mode..."
+else
+  echo "==> Creating target directory..."
+  mkdir -p "$TARGET_DIR"
+fi
 
 echo "==> Downloading compose.yaml..."
 curl -fsSL "$COMPOSE_URL" -o "$TARGET_DIR/compose.yaml"

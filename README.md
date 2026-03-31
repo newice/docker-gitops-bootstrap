@@ -9,9 +9,10 @@ It is designed to:
 - Maintain a consistent structure across multiple Docker hosts
 
 ## Quickstart 
-'''bash
+
+```bash
 curl -sSL https://raw.githubusercontent.com/newice/docker-gitops-bootstrap/main/bootstrap-docker-host.sh | bash
-'''
+```
 
 ## Key Characteristics
 

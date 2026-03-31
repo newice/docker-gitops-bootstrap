@@ -8,6 +8,11 @@ It is designed to:
 - Enable GitOps-style deployments using a CI/CD pipeline
 - Maintain a consistent structure across multiple Docker hosts
 
+## Quickstart 
+'''bash
+curl -sSL https://raw.githubusercontent.com/newice/docker-gitops-bootstrap/main/bootstrap-docker-host.sh | bash
+'''
+
 ## Key Characteristics
 
 - **Docker Compose only** — no Kubernetes, no Swarm, no orchestrator

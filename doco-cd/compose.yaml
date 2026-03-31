@@ -7,8 +7,29 @@
 #      target: ""  # Optional: use to target a specific deployment config file, e.g., "test" -> .doco-cd.test.yaml
 
 services:
+  setup:
+    image: alpine:3.21
+    restart: "no"
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        if [ -f /data/age-keys.txt ]; then
+          echo "age key already exists, skipping generation."
+        else
+          apk add --no-cache age
+          age-keygen -o /data/age-keys.txt
+          chmod 600 /data/age-keys.txt
+          echo "age key pair generated."
+        fi
+    volumes:
+      - ${DATA_PATH:-.}/data:/data
+
   app:
     container_name: doco-cd
+    depends_on:
+      setup:
+        condition: service_completed_successfully
     # You can also pin to a specific tag (version)
     # Available tags can be found here: https://github.com/kimdre/doco-cd/pkgs/container/doco-cd
     image: ghcr.io/kimdre/doco-cd:latest

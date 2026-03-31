@@ -118,6 +118,9 @@ DATA_PATH=$DATA_PATH
 LOG_LEVEL=$LOG_LEVEL
 EOF
 
+# Ensure data directory exists for bind mount before first compose run
+mkdir -p "$TARGET_DIR/data"
+
 echo "==> Pulling latest images..."
 docker compose pull
 
@@ -132,3 +135,13 @@ echo "    Secret:       $WEBHOOK_SECRET"
 echo ""
 echo "==> Add the webhook secret to your repo at:"
 echo "    https://github.com/<repo>/settings/secrets/actions"
+
+# Display age public key for SOPS encryption
+AGE_KEY_FILE="$TARGET_DIR/data/age-keys.txt"
+if [[ -f "$AGE_KEY_FILE" ]]; then
+  AGE_PUBLIC_KEY=$(grep '# public key:' "$AGE_KEY_FILE" | sed 's/.*# public key: //')
+  echo ""
+  echo "==> SOPS/age encryption:"
+  echo "    Public key: $AGE_PUBLIC_KEY"
+  echo "    Use in .sops.yaml or with: sops encrypt --age $AGE_PUBLIC_KEY <file>"
+fi

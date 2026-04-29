@@ -11,7 +11,24 @@ It is designed to:
 ## Quickstart 
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/newice/docker-gitops-bootstrap/main/bootstrap-docker-host.sh | bash
+curl -fsSL https://raw.githubusercontent.com/newice/docker-gitops-bootstrap/main/bootstrap-docker-host.sh | sudo bash
+```
+
+## Bootstrap Script Usage
+
+The bootstrap script installs `doco-cd` into `/opt/homelab/doco-cd` by default.
+
+```bash
+./bootstrap-docker-host.sh [--token <GIT_ACCESS_TOKEN>] [--base-dir <PATH>]
+```
+
+Examples:
+
+```bash
+sudo ./bootstrap-docker-host.sh
+sudo ./bootstrap-docker-host.sh --token ghp_xxx
+sudo ./bootstrap-docker-host.sh --base-dir /srv/homelab
+curl -fsSL https://raw.githubusercontent.com/newice/docker-gitops-bootstrap/main/bootstrap-docker-host.sh | sudo bash -s -- --base-dir /srv/homelab
 ```
 
 ## Key Characteristics

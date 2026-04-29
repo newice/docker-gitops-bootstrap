@@ -2,19 +2,23 @@
 
 set -euo pipefail
 
-if [[ $EUID -ne 0 ]]; then
-  echo "Error: This script must be run as root (use sudo)." >&2
-  exit 1
-fi
-
-TARGET_DIR="/opt/homelab/doco-cd"
+DEFAULT_BASE_DIR="/opt/homelab"
 COMPOSE_URL="https://raw.githubusercontent.com/newice/docker-gitops-bootstrap/main/doco-cd/compose.yaml"
-ENV_FILE="$TARGET_DIR/.env"
 
 # --- Helper functions ---
 
 generate_secret() {
   openssl rand -hex 32
+}
+
+require_value() {
+  local option="$1"
+  local value="${2:-}"
+
+  if [[ -z "$value" || "$value" == --* ]]; then
+    echo "Error: $option requires a value." >&2
+    usage
+  fi
 }
 
 # Source existing .env file to preserve secrets across re-runs
@@ -34,26 +38,36 @@ load_existing_env() {
 # --- Parse arguments ---
 
 usage() {
-  echo "Usage: $0 [--token <GIT_ACCESS_TOKEN>]"
+  local exit_code="${1:-1}"
+
+  echo "Usage: $0 [--token <GIT_ACCESS_TOKEN>] [--base-dir <PATH>]"
   echo ""
   echo "Options:"
-  echo "  --token    GitHub personal access token for doco-cd"
+  echo "  --token       GitHub personal access token for doco-cd"
+  echo "  --base-dir    Base directory for the doco-cd installation (default: $DEFAULT_BASE_DIR)"
   echo ""
   echo "If not provided, the script will prompt for the token on first run."
   echo "On subsequent runs, the existing token is preserved unless --token is given."
-  exit 1
+  exit "$exit_code"
 }
 
 ARG_TOKEN=""
+BASE_DIR="$DEFAULT_BASE_DIR"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --token)
+      require_value "$1" "${2:-}"
       ARG_TOKEN="$2"
       shift 2
       ;;
+    --base-dir)
+      require_value "$1" "${2:-}"
+      BASE_DIR="$2"
+      shift 2
+      ;;
     --help|-h)
-      usage
+      usage 0
       ;;
     *)
       echo "Unknown option: $1"
@@ -62,7 +76,24 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+BASE_DIR="${BASE_DIR%/}"
+if [[ -z "$BASE_DIR" ]]; then
+  BASE_DIR="/"
+fi
+
+TARGET_DIR="${BASE_DIR%/}/doco-cd"
+if [[ "$BASE_DIR" == "/" ]]; then
+  TARGET_DIR="/doco-cd"
+fi
+
+ENV_FILE="$TARGET_DIR/.env"
+
 # --- Main ---
+
+if [[ $EUID -ne 0 ]]; then
+  echo "Error: This script must be run as root (use sudo)." >&2
+  exit 1
+fi
 
 if [[ -d "$TARGET_DIR" ]]; then
   echo "==> Target directory exists, running in update mode..."

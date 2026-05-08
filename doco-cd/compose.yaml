@@ -31,7 +31,7 @@ services:
         condition: service_completed_successfully
     # You can also pin to a specific tag (version)
     # Available tags can be found here: https://github.com/kimdre/doco-cd/pkgs/container/doco-cd
-    image: ghcr.io/kimdre/doco-cd:v0.85.1
+    image: ghcr.io/kimdre/doco-cd:0.85.1
     restart: unless-stopped
     ports:
       - "8000:80" # Webhook endpoint
